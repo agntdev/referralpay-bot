@@ -3,17 +3,18 @@
     "name": "View Leaderboard",
     "steps": [
       {
+        "send": { "callback": "leaderboard:view" },
         "expect": [
+          {
+            "method": "answerCallbackQuery"
+          },
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Display top 10 earners in referral program"
+              "text": "🏆 Leaderboard\n\nNo referrals yet. Be the first to earn!"
             }
           }
-        ],
-        "send": {
-          "callback": "leaderboard:view"
-        }
+        ]
       }
     ]
   }

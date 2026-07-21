@@ -1,17 +1,38 @@
 import { Composer } from "grammy";
+import type { Ctx } from "../bot.js";
+import { inlineButton, inlineKeyboard } from "../toolkit/index.js";
+import { getLeaderboard } from "../storage.js";
 
-// SCAFFOLD — generated from the bot blueprint BEFORE the agent runs.
-// Keep a LIVE registration (.command / .callbackQuery / …) so this feature is
-// never an empty stub. Replace the reply body with real logic + copy; if you
-// change the user-facing text, update tests/specs to match EXACTLY.
-// Do NOT rewrite src/bot.ts — buildBot() already auto-loads this module.
-// Menu: wire this into /start via registerMainMenuItem({ label: "View Leaderboard", data: "leaderboard:view" }) if the toolkit exposes it.
-
-const composer = new Composer();
+const composer = new Composer<Ctx>();
 
 composer.callbackQuery("leaderboard:view", async (ctx) => {
   await ctx.answerCallbackQuery();
-  await ctx.reply("Display top 10 earners in referral program");
+  
+  const leaderboard = await getLeaderboard(10);
+  
+  if (leaderboard.length === 0) {
+    await ctx.reply(
+      "🏆 Leaderboard\n\nNo referrals yet. Be the first to earn!",
+      {
+        reply_markup: inlineKeyboard([[inlineButton("⬅️ Back to menu", "menu:main")]]),
+      }
+    );
+    return;
+  }
+
+  // Format leaderboard
+  const lines = leaderboard.map((user, index) => {
+    const medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `${index + 1}.`;
+    const name = user.username ? `@${user.username}` : `User ${user.id}`;
+    return `${medal} ${name} — $${user.stats.total_earned.toFixed(2)}`;
+  });
+
+  await ctx.reply(
+    `🏆 Top 10 Earners\n\n${lines.join("\n")}`,
+    {
+      reply_markup: inlineKeyboard([[inlineButton("⬅️ Back to menu", "menu:main")]]),
+    }
+  );
 });
 
 export default composer;

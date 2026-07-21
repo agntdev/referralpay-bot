@@ -3,17 +3,27 @@
     "name": "Copy referral link",
     "steps": [
       {
+        "send": { "text": "/start" },
         "expect": [
           {
             "method": "sendMessage",
+            "payload": { "text": "👋 Welcome! Tap a button below to get started." }
+          }
+        ]
+      },
+      {
+        "send": { "callback": "referral:copy" },
+        "expect": [
+          {
+            "method": "answerCallbackQuery"
+          },
+          {
+            "method": "editMessageText",
             "payload": {
-              "text": "Generate and copy unique referral link to clipboard"
+              "text": "🔗 Your referral link:\n\nhttps://t.me/test_bot?start=REF1\n\nShare this link with friends. You earn $0.01 for each valid referral!"
             }
           }
-        ],
-        "send": {
-          "callback": "referral:copy"
-        }
+        ]
       }
     ]
   }
