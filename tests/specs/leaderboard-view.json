@@ -1,0 +1,20 @@
+[
+  {
+    "name": "View Leaderboard",
+    "steps": [
+      {
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Display top 10 earners in referral program"
+            }
+          }
+        ],
+        "send": {
+          "callback": "leaderboard:view"
+        }
+      }
+    ]
+  }
+]
