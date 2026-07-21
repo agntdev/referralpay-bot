@@ -3,17 +3,18 @@
     "name": "Withdraw Earnings",
     "steps": [
       {
+        "send": { "callback": "withdraw:start" },
         "expect": [
+          {
+            "method": "answerCallbackQuery"
+          },
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Initiate USDT withdrawal request flow"
+              "text": "Your balance is $0.00. Minimum withdrawal is $10. Keep earning!"
             }
           }
-        ],
-        "send": {
-          "callback": "withdraw:start"
-        }
+        ]
       }
     ]
   }

@@ -1,17 +1,41 @@
 import { Composer } from "grammy";
+import type { Ctx } from "../bot.js";
+import { inlineButton, inlineKeyboard } from "../toolkit/index.js";
+import { getUser } from "../storage.js";
 
-// SCAFFOLD — generated from the bot blueprint BEFORE the agent runs.
-// Keep a LIVE registration (.command / .callbackQuery / …) so this feature is
-// never an empty stub. Replace the reply body with real logic + copy; if you
-// change the user-facing text, update tests/specs to match EXACTLY.
-// Do NOT rewrite src/bot.ts — buildBot() already auto-loads this module.
-// Menu: wire this into /start via registerMainMenuItem({ label: "Copy referral link", data: "referral:copy" }) if the toolkit exposes it.
+const composer = new Composer<Ctx>();
 
-const composer = new Composer();
+const backToMenu = inlineKeyboard([[inlineButton("⬅️ Back to menu", "menu:main")]]);
 
 composer.callbackQuery("referral:copy", async (ctx) => {
   await ctx.answerCallbackQuery();
-  await ctx.reply("Generate and copy unique referral link to clipboard");
+  
+  const userId = ctx.from?.id;
+  if (!userId) {
+    await ctx.reply("Please start the bot first with /start", {
+      reply_markup: backToMenu,
+    });
+    return;
+  }
+
+  const user = await getUser(userId);
+  if (!user) {
+    await ctx.reply("Please start the bot first with /start", {
+      reply_markup: backToMenu,
+    });
+    return;
+  }
+
+  // Generate the referral link
+  const botUsername = ctx.me?.username || "your_bot";
+  const referralUrl = `https://t.me/${botUsername}?start=${user.referral_code}`;
+
+  await ctx.editMessageText(
+    `🔗 Your referral link:\n\n${referralUrl}\n\nShare this link with friends. You earn $0.01 for each valid referral!`,
+    {
+      reply_markup: backToMenu,
+    }
+  );
 });
 
 export default composer;
